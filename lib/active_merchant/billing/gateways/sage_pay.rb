@@ -16,7 +16,8 @@ module ActiveMerchant #:nodoc:
         :authorization => 'DEFERRED',
         :capture => 'RELEASE',
         :void => 'VOID',
-        :abort => 'ABORT'
+        :abort => 'ABORT',
+        :repeat => 'REPEAT'
       }
       
       CREDIT_CARDS = {
@@ -73,6 +74,15 @@ module ActiveMerchant #:nodoc:
 
         commit(:purchase, post)
       end
+
+      def repeat(money, identification, options = {})
+        post = {}
+
+        add_invoice(post, options)
+        add_amount(post, money, options)
+        add_reference_for_repeat(post, identification)
+        commit(:repeat, post)
+      end
       
       def authorize(money, credit_card, options = {})
         requires!(options, :order_id)
@@ -128,6 +138,15 @@ module ActiveMerchant #:nodoc:
         add_pair(post, :VPSTxId, transaction_id)
         add_pair(post, :TxAuthNo, authorization)
         add_pair(post, :SecurityKey, security_key)
+      end
+
+      def add_reference_for_repeat(post, identification)
+        order_id, transaction_id, authorization, security_key = identification.split(';') 
+        
+        add_pair(post, :RelatedVendorTxCode, order_id)
+        add_pair(post, :RelatedVPSTxId, transaction_id)
+        add_pair(post, :RelatedTxAuthNo, authorization)
+        add_pair(post, :RelatedSecurityKey, security_key)
       end
       
       def add_credit_reference(post, identification)

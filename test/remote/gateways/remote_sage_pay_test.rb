@@ -6,7 +6,7 @@ require 'test_helper'
 # American express enabled.
 class RemoteSagePayTest < Test::Unit::TestCase
   # set to true to run the tests in the simulated environment
-  SagePayGateway.simulate = false
+  SagePayGateway.simulate = true
   
   def setup
     @gateway = SagePayGateway.new(fixtures(:sage_pay))
@@ -78,8 +78,8 @@ class RemoteSagePayTest < Test::Unit::TestCase
     )
 
     @declined_card = CreditCard.new(
-      :number => '4111111111111111',
-      :month => 9,
+      :number => '4111111111111112',
+      :month => nil,
       :year => next_year,
       :first_name => 'Tekin',
       :last_name => 'Suleyman',
@@ -172,6 +172,17 @@ class RemoteSagePayTest < Test::Unit::TestCase
     assert !response.authorization.blank?
   end
 
+  def test_successful_visa_repeat
+    # Before we can repeat a transaction we must make one
+    assert auth = @gateway.purchase(@amount, @visa, @options)
+    assert_success auth
+    @options[:order_id] = generate_unique_id # Reset this ID for the repeat
+    assert response = @gateway.repeat(@amount, auth.authorization, @options)
+    assert_success response
+    assert response.test?
+    assert !response.authorization.blank?
+  end
+
   def test_successful_maestro_purchase
     assert response = @gateway.purchase(@amount, @maestro, @options)
     assert_success response
@@ -201,7 +212,7 @@ class RemoteSagePayTest < Test::Unit::TestCase
   end
   
   def test_invalid_login
-    message = SagePayGateway.simulate ? 'VSP Simulator cannot find your vendor name.  Ensure you have have supplied a Vendor field with your VSP Vendor name assigned to it.' : '3034 : The Vendor or VendorName value is required.' 
+    message = SagePayGateway.simulate ? 'Simulator cannot find your vendor name.  Ensure you have have supplied a Vendor field with your Vendor name assigned to it.' : '3034 : The Vendor or VendorName value is required.' 
     
     gateway = SagePayGateway.new(
         :login => ''

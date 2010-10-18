@@ -7,6 +7,7 @@ class SagePayTest < Test::Unit::TestCase
     )
 
     @credit_card = credit_card('4242424242424242', :type => 'visa')
+    @identification = "1;2;3;4"
     @options = { 
       :billing_address => { 
         :name => 'Tekin Suleyman',
@@ -89,6 +90,14 @@ class SagePayTest < Test::Unit::TestCase
     # 20 PAN length
     assert_no_match SagePayGateway::ELECTRON, '42496200000000000'
   end
+
+  def test_successful_repeat
+    @gateway.expects(:ssl_post).returns(successful_repeat_response)
+
+    response = @gateway.repeat(@amount, @identification, @options)
+    assert_instance_of Response, response
+    assert_success response
+  end
   
   def test_avs_result
      @gateway.expects(:ssl_post).returns(successful_purchase_response)
@@ -123,6 +132,22 @@ class SagePayTest < Test::Unit::TestCase
   end
    
   private
+
+  def successful_repeat_response
+    <<-RESP
+VPSProtocol=2.23
+Status=OK
+StatusDetail=0000 : The Repeat was Successful.
+VPSTxId=B8AE1CF6-9DEF-C876-1BB4-9B382E6CE520
+SecurityKey=OHMETD7DFK
+TxAuthNo=4193753
+AVSCV2=NO DATA MATCHES
+AddressResult=NOTMATCHED
+PostCodeResult=MATCHED
+CV2Result=NOTMATCHED
+3DSecureStatus=NOTCHECKED
+    RESP
+  end
 
   def successful_purchase_response
     <<-RESP

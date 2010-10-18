@@ -170,8 +170,10 @@ plugnpay:
   password: PASSWORD
   
 sage_pay:
-  login: LOGIN
-  
+  login: enspiral
+  password: myn09gaz 
+  vendor: enspiral
+
 # Working credentials, no need to replace
 psigate:
   login: teststore
@@ -314,8 +316,8 @@ realex_mastercard_coms_error:
   verification_value: '123'
 
 sage:
-  login: login
-  password: password
+  login: enspiral
+  password: myn09gaz
 
 sallie_mae:
   login: TEST0
