@@ -7,7 +7,12 @@ class SagePayTest < Test::Unit::TestCase
     )
 
     @credit_card = credit_card('4242424242424242', :type => 'visa')
-    @identification = "1;2;3;4"
+    @identification = {
+      "VendorTxCode" => '1',
+      "VPSTxId" => '2',
+      "TxAuthNo" => '3',
+      "SecurityKey" => '4'
+    }
     @options = { 
       :billing_address => { 
         :name => 'Tekin Suleyman',
