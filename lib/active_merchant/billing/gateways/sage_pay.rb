@@ -141,10 +141,12 @@ module ActiveMerchant #:nodoc:
       end
 
       def add_reference_for_repeat(post, identification)
-        add_pair(post, :RelatedVendorTxCode, identification["VendorTxCode"])
-        add_pair(post, :RelatedVPSTxId, identification["VPSTxId"])
-        add_pair(post, :RelatedTxAuthNo, identification["TxAuthNo"])
-        add_pair(post, :RelatedSecurityKey, identification["SecurityKey"])
+        order_id, transaction_id, authorization, security_key = identification.split(';') 
+        
+        add_pair(post, :RelatedVendorTxCode, order_id)
+        add_pair(post, :RelatedVPSTxId, transaction_id)
+        add_pair(post, :RelatedTxAuthNo, authorization)
+        add_pair(post, :RelatedSecurityKey, security_key)
       end
       
       def add_credit_reference(post, identification)
